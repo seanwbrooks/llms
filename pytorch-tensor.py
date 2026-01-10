@@ -176,3 +176,8 @@ def compute_accuracy(model, dataloader):
 print('Compute accuracy ', compute_accuracy(model, train_loader))
 
 torch.save(model.state_dict(), "model.pth")
+
+# Running training loop on GPU
+print(torch.cuda.is_available())
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+print(device)
