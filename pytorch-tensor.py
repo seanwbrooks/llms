@@ -88,10 +88,10 @@ print(out)
 
 ## Setting up efficient data loaders
 # Creating a small toy dataset
-X_train = torch.tensor([[-1.2, 3.1],[-0.9, 2.9],[-0.5, 2.6],[2.3, -1.1],[2.7, -1.5]])
+X_train = torch.tensor([[-1.2, 3.1, 1.3],[-0.9, 2.9, 1.0],[-0.5, 2.6, -1.9],[2.3, -1.1, -0.3],[2.7, -1.5, 1.0]])
 y_train = torch.tensor([0, 0, 0, 1, 1])
-X_test = torch.tensor([[-0.8, 2.8],[2.6, -1.6]])
-y_test = torch.tensor([0, 1])
+X_test = torch.tensor([[-0.8, 2.8, 2.0],[2.6, -1.6, -0.9]])
+y_test = torch.tensor([0, 1, 0])
 
 # Defining a custom Dataset class
 from torch.utils.data import Dataset
@@ -133,7 +133,7 @@ for idx, (x, y) in enumerate(train_loader):
 # Neural Network training in PyTorch
 torch.manual_seed(123)
 
-model = NeuralNetwork(num_inputs=2, num_outputs=2)
+model = NeuralNetwork(num_inputs=3, num_outputs=2)
 optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
 
 num_epochs = 3
@@ -186,7 +186,7 @@ print(device)
 # A training loop on a GPU
 start_time = time.perf_counter()
 torch.manual_seed(123)
-model = NeuralNetwork(num_inputs=8, num_outputs=8)
+model = NeuralNetwork(num_inputs=3, num_outputs=2)
 
 device = torch.device("mps")
 model = model.to(device)
@@ -221,7 +221,7 @@ print(f"MPS elapsed time: {elapsed_time}")
 # A training loop on the CPU
 start_time = time.perf_counter()
 torch.manual_seed(123)
-model = NeuralNetwork(num_inputs=8, num_outputs=8)
+model = NeuralNetwork(num_inputs=3, num_outputs=2)
 
 device = torch.device("cpu")
 print(device)
