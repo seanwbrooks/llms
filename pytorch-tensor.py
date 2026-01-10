@@ -186,7 +186,7 @@ print(device)
 # A training loop on a GPU
 start_time = time.perf_counter()
 torch.manual_seed(123)
-model = NeuralNetwork(num_inputs=2, num_outputs=2)
+model = NeuralNetwork(num_inputs=8, num_outputs=8)
 
 device = torch.device("mps")
 model = model.to(device)
@@ -221,7 +221,7 @@ print(f"MPS elapsed time: {elapsed_time}")
 # A training loop on the CPU
 start_time = time.perf_counter()
 torch.manual_seed(123)
-model = NeuralNetwork(num_inputs=2, num_outputs=2)
+model = NeuralNetwork(num_inputs=8, num_outputs=8)
 
 device = torch.device("cpu")
 print(device)
