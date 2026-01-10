@@ -1,0 +1,5 @@
+This sample tokenization scheme mostly works for separating the example text into individual words; however, some words are still connected to punctuation characters that we want to have as separate list entries. We also refrain from making all text lowercase because capitalization helps LLMs distinguish between proper nouns and common nouns, understand sentence structure, and learn to generate text with proper capitalization.
+
+Let's modify the regular expression splits on whitespace (\s), commas, and periods ([,.]):
+
+Hello, old friend. Do you like some tea?
