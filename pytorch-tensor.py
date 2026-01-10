@@ -1,4 +1,5 @@
 import torch
+import time
 
 # Common PyTorch tensor operations
 tensor2d = torch.tensor([[1,2,3],[4,5,6]])
@@ -183,6 +184,7 @@ device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 print(device)
 
 # A training loop on a GPU
+start_time = time.perf_counter()
 torch.manual_seed(123)
 model = NeuralNetwork(num_inputs=2, num_outputs=2)
 
@@ -211,4 +213,43 @@ for epoch in range(num_epochs):
 		      f" | Train/Val Loss: {loss:.2f}")
 
 		model.eval()
+end_time = time.perf_counter()
+elapsed_time = end_time - start_time
+# Evaluate performance
+print(f"MPS elapsed time: {elapsed_time}")
+
+# A training loop on the CPU
+start_time = time.perf_counter()
+torch.manual_seed(123)
+model = NeuralNetwork(num_inputs=2, num_outputs=2)
+
+device = torch.device("cpu")
+print(device)
+model = model.to(device)
+
+optimizer = torch.optim.SGD(model.parameters(), lr=0.5)
+
+num_epochs = 3
+
+for epoch in range(num_epochs):
+	model.train()
+	for batch_idx, (features, labels) in enumerate(train_loader):
+		features, labels = features.to(device), labels.to(device)
+		logits = model(features)
+		loss = F.cross_entropy(logits, labels) # Loss function
+
+		optimizer.zero_grad()
+		loss.backward()
+		optimizer.step()
+
+		### LOGGING
+		print(f"Epoch: {epoch+1:03d}/{num_epochs:03d}"
+		      f" | Batch {batch_idx:03d}/{len(train_loader):03d}"
+		      f" | Train/Val Loss: {loss:.2f}")
+
+		model.eval()
+end_time = time.perf_counter()
+elapsed_time = end_time - start_time
+# Evaluate performance
+print(f"CPU elapsed time: {elapsed_time}")
 
