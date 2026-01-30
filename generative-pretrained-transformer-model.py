@@ -71,3 +71,15 @@ model = DummyGPTModel(GPT_CONFIG_124M)
 logits = model(batch)
 print("Output shape: ", logits.shape)
 print(logits)
+
+# create 2 training examples with 5 dimensions
+torch.manual_seed(123)
+batch_example = torch.randn(2, 5)
+layer = nn.Sequential(nn.Linear(5, 6), nn.ReLU())
+out = layer(batch_example)
+print(out)
+
+mean = out.mean(dim=-1, keepdim=True)
+var = out.var(dim=-1, keepdim=True)
+print("Mean: \n", mean)
+print("Variance: \n", var)
