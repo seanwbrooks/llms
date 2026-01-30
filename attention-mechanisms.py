@@ -162,7 +162,7 @@ class MultiHeadAttention(nn.Module):
 			"d_out must be divisible by num_heads"
 		self.d_out = d_out
 		self.num_heads = num_heads
-		self.head_dim = d_out
+		self.head_dim = d_out // num_heads
 		self.W_query = nn.Linear(d_in, d_out, bias=qkv_bias)
 		self.W_key = nn.Linear(d_in, d_out, bias=qkv_bias)
 		self.W_value = nn.Linear(d_in, d_out, bias=qkv_bias)
@@ -201,7 +201,7 @@ torch.manual_seed(123)
 batch_size, context_length, d_in = batch.shape
 print("batch_size, context_length, d_in: ", batch_size, context_length, d_in)
 d_out = 2
-mha = MultiHeadAttention(d_in, d_out, context_length, 0.0, num_heads=2) # TODO: Debug RuntimeError: shape '[2, 6, 2, 2]' is invalid for input of size 24
+mha = MultiHeadAttention(d_in, d_out, context_length, 0.0, num_heads=2)
 context_vecs = mha(batch)
 print(context_vecs)
 print("context_vecs.shape: ", context_vecs.shape)
