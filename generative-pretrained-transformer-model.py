@@ -136,5 +136,150 @@ for i, (y, label) in enumerate(zip([y_gelu, y_relu], ["GELU", "RELU"]), 1):
 	plt.xlabel("x")
 	plt.ylabel(f"{label}(x)")
 	plt.grid(True)
-plt.tight_layout()
-plt.show()
+# uncomment if you want to see graph
+# plt.tight_layout()
+# plt.show()
+
+# A feed forward neural network module
+class FeedForward(nn.Module):
+	def __init__(self, cfg):
+		super().__init__()
+		self.layers = nn.Sequential(
+			nn.Linear(cfg["emb_dim"], 4 * cfg["emb_dim"]),
+			GELU(),
+			nn.Linear(4 * cfg["emb_dim"], cfg["emb_dim"]),
+		)
+	def forward(self, x):
+		return self.layers(x)
+
+ffn = FeedForward(GPT_CONFIG_124M)
+x = torch.rand(2, 3, 768)
+out = ffn(x)
+print(out.shape)
+
+class ExampleDeepNeuralNetwork(nn.Module):
+	def __init__(self, layer_sizes, use_shortcut):
+		super().__init__()
+		self.use_shortcut = use_shortcut
+		self.layers = nn.ModuleList([
+			nn.Sequential(nn.Linear(layer_sizes[0], layer_sizes[1]), GELU()),
+			nn.Sequential(nn.Linear(layer_sizes[1], layer_sizes[2]), GELU()),
+			nn.Sequential(nn.Linear(layer_sizes[2], layer_sizes[3]), GELU()),
+			nn.Sequential(nn.Linear(layer_sizes[3], layer_sizes[4]), GELU()),
+			nn.Sequential(nn.Linear(layer_sizes[4], layer_sizes[5]), GELU())
+		])
+	def forward(self, x):
+		for layer in self.layers:
+			layer_output = layer(x)
+			if self.use_shortcut and x.shape == layer_output.shape:
+				x = x + layer_output
+			else:
+				x = layer_output
+		return x
+
+layer_sizes = [3, 3, 3, 3, 3, 1]
+sample_input = torch.tensor([[1., 0, -1.]])
+torch.manual_seed(123)
+model_without_shortcut = ExampleDeepNeuralNetwork(layer_sizes, use_shortcut=False)
+
+def print_gradients(model, x):
+	output = model(x)
+	target = torch.tensor([[0.]])
+	
+	loss = nn.MSELoss()
+	loss = loss(output, target)
+
+	loss.backward()
+	for name, param in model.named_parameters():
+		if 'weight' in name:
+			print(f"{name} has gradient mean of {param.grad.abs().mean().item()}")
+
+print_gradients(model_without_shortcut, sample_input)
+
+torch.manual_seed(123)
+model_with_shortcut = ExampleDeepNeuralNetwork(layer_sizes, use_shortcut=True)
+print_gradients(model_with_shortcut, sample_input)
+
+# The transformer block component of GPT
+import importlib
+attention = importlib.import_module("attention-mechanisms")
+
+class TransformerBlock(nn.Module):
+	def __init__(self, cfg):
+		super().__init__()
+		self.att = attention.MultiHeadAttention(
+			d_in=cfg["emb_dim"],
+			d_out=cfg["emb_dim"],
+			context_length = cfg["context_length"],
+			num_heads = cfg["n_heads"],
+			dropout = cfg["drop_rate"],
+			qkv_bias = cfg["qkv_bias"],
+		)
+		self.ff = FeedForward(cfg)
+		self.norm1 = LayerNorm(cfg["emb_dim"])
+		self.norm2 = LayerNorm(cfg["emb_dim"])
+		self.drop_shortcut = nn.Dropout(cfg["drop_rate"])
+	def forward(self, x):
+		shortcut = x
+		x = self.norm1(x)
+		x = self.att(x)
+		x = self.drop_shortcut(x)
+		x = x + shortcut
+		shortcut = x
+		x = self.norm2(x)
+		x = self.ff(x)
+		x = self.drop_shortcut(x)
+		x = x + shortcut
+		return x
+
+torch.manual_seed(123)
+x = torch.rand(2, 4, 768)
+block = TransformerBlock(GPT_CONFIG_124M)
+output = block(x)
+
+print("Input shape: ", x.shape)
+print("Output shape: ", output.shape)
+
+# The GPT model architecture implementation
+class GPTModel(nn.Module):
+	def __init__(self, cfg):
+		super().__init__()
+		self.tok_emb = nn.Embedding(cfg["vocab_size"], cfg["emb_dim"])
+		self.pos_emb = nn.Embedding(cfg["context_length"], cfg["emb_dim"])
+		self.drop_emb = nn.Dropout(cfg["drop_rate"])
+
+		self.trf_blocks = nn.Sequential(*[TransformerBlock(cfg) for _ in range(cfg["n_layers"])])
+		
+		self.final_norm = LayerNorm(cfg["emb_dim"])
+		self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False)
+	def forward(self, in_idx):
+		batch_size, seq_len = in_idx.shape
+		tok_embeds = self.tok_emb(in_idx)
+		pos_embeds = self.pos_emb(torch.arange(seq_len, device=in_idx.device))
+		x = tok_embeds + pos_embeds
+		x = self.trf_blocks(x)
+		x = self.final_norm(x)
+		logits = self.out_head(x)
+		return logits
+
+torch.manual_seed(123)
+model = GPTModel(GPT_CONFIG_124M)
+out = model(batch)
+print("Input batch:\n", batch)
+print("\nOutput shape:", out.shape)
+print(out)
+
+total_params = sum(p.numel() for p in model.parameters())
+print(f"Total number of parameters; {total_params:,}")
+
+print("Token embedding layer shape: ", model.tok_emb.weight.shape)
+print("Output layer shape: ", model.out_head.weight.shape)
+
+total_params_gpt2 = (
+	total_params - sum(p.numel()
+	for p in model.out_head.parameters())
+)
+print(f"Number of trainable parameters "
+	f"considering weight tying: {total_params_gpt2}"
+)
+
