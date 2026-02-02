@@ -3,7 +3,7 @@ import importlib
 gptmodel = importlib.import_module("generative-pretrained-transformer-model") 
 import tiktoken
 
-file_path = "the-verdict.txt"
+file_path = "./text-files/walt-whitman-departure.txt"
 with open(file_path, "r", encoding="utf-8") as f:
 	text_data = f.read()
 
