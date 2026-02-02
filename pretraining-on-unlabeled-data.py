@@ -3,6 +3,10 @@ import importlib
 gptmodel = importlib.import_module("generative-pretrained-transformer-model") 
 import tiktoken
 
+file_path = "the-verdict.txt"
+with open(file_path, "r", encoding="utf-8") as f:
+	text_data = f.read()
+
 GPT_CONFIG_124M = {
 	"vocab_size": 50257,
 	"context_length": 256,
@@ -78,3 +82,7 @@ print("Flattened targets: ", targets_flat.shape)
 
 loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
 
+total_characters = len(text_data)
+total_tokens = len(tokenizer.encode(text_data))
+print("Characters: ", total_characters)
+print("Tokens: ", total_tokens)
