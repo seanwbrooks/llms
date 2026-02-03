@@ -3,7 +3,7 @@ from importlib.metadata import version
 import tiktoken
 print("tiktoken version: ", version("tiktoken"))
 
-with open("text-for-data-prep.txt", "r", encoding="UTF-8") as f:
+with open("./text-files/text-for-data-prep.txt", "r", encoding="UTF-8") as f:
 	text = f.read()
 
 tokenizer = tiktoken.get_encoding("gpt2")

@@ -1,9 +1,10 @@
 import torch
 import importlib
-gptmodel = importlib.import_module("generative-pretrained-transformer-model") 
+from generative_pretrained_transformer_model import GPTModel
 import tiktoken
+bytepairencoding = importlib.import_module("byte-pair-encoding")
 
-file_path = "./text-files/walt-whitman-departure.txt"
+file_path = "./text-files/infinite-jest.txt"
 with open(file_path, "r", encoding="utf-8") as f:
 	text_data = f.read()
 
@@ -18,7 +19,7 @@ GPT_CONFIG_124M = {
 }
 
 torch.manual_seed(123)
-model = gptmodel.GPTModel(GPT_CONFIG_124M)
+model = GPTModel(GPT_CONFIG_124M)
 model.eval()
 
 def text_to_token_ids(text, tokenizer):
@@ -86,3 +87,35 @@ total_characters = len(text_data)
 total_tokens = len(tokenizer.encode(text_data))
 print("Characters: ", total_characters)
 print("Tokens: ", total_tokens)
+
+train_ratio = 0.90
+split_idx = int(train_ratio * len(text_data))
+train_data = text_data[:split_idx]
+val_data = text_data[split_idx:]
+
+torch.manual_seed(123)
+train_loader = bytepairencoding.create_dataloader_v1(
+	train_data,
+	batch_size=2,
+	max_length=GPT_CONFIG_124M["context_length"],
+	stride=GPT_CONFIG_124M["context_length"],
+	drop_last=True,
+	shuffle=True,
+	num_workers=0
+)
+val_loader = bytepairencoding.create_dataloader_v1(
+	val_data,
+	batch_size=2,
+	max_length=GPT_CONFIG_124M["context_length"],
+	stride=GPT_CONFIG_124M["context_length"],
+	drop_last=True,
+	shuffle=True,
+	num_workers=0
+)
+print("Train loader: ")
+for x, y in train_loader:
+	print(x.shape, y.shape)
+
+print("\nValidation loader: ")
+for x, y in val_loader:
+	print(x.shape, y.shape)
