@@ -1,10 +1,10 @@
 import torch
 import importlib
-from generative_pretrained_transformer_model import GPTModel
+from generative_pretrained_transformer_model import GPTModel, generate_text_simple
 import tiktoken
-bytepairencoding = importlib.import_module("byte-pair-encoding")
+from byte_pair_encoding import create_dataloader_v1
 
-file_path = "./text-files/infinite-jest.txt"
+file_path = "./text_files/infinite-jest.txt"
 with open(file_path, "r", encoding="utf-8") as f:
 	text_data = f.read()
 
@@ -34,7 +34,7 @@ def token_ids_to_text(token_ids, tokenizer):
 start_context = "Every time man"
 tokenizer = tiktoken.get_encoding("gpt2")
 
-token_ids = gptmodel.generate_text_simple(
+token_ids = generate_text_simple(
 	model=model,
 	idx=text_to_token_ids(start_context, tokenizer),
 	max_new_tokens=10,
@@ -94,7 +94,7 @@ train_data = text_data[:split_idx]
 val_data = text_data[split_idx:]
 
 torch.manual_seed(123)
-train_loader = bytepairencoding.create_dataloader_v1(
+train_loader = create_dataloader_v1(
 	train_data,
 	batch_size=2,
 	max_length=GPT_CONFIG_124M["context_length"],
@@ -103,7 +103,7 @@ train_loader = bytepairencoding.create_dataloader_v1(
 	shuffle=True,
 	num_workers=0
 )
-val_loader = bytepairencoding.create_dataloader_v1(
+val_loader = create_dataloader_v1(
 	val_data,
 	batch_size=2,
 	max_length=GPT_CONFIG_124M["context_length"],
