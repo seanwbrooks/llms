@@ -238,8 +238,8 @@ gpt.to(device)
 torch.manual_seed(123)
 token_ids = generate(
     model=gpt,
-    idx=text_to_token_ids("Don Gately was a ", tokenizer).to(device),
-    max_new_tokens=25,
+    idx=text_to_token_ids("Don Gately was a character in what novel?", tokenizer).to(device),
+    max_new_tokens=50,
     context_size=NEW_CONFIG["context_length"],
     top_k=50,
     temperature=1.5
