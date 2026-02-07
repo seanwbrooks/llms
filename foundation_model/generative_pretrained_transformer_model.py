@@ -201,7 +201,7 @@ model_with_shortcut = ExampleDeepNeuralNetwork(layer_sizes, use_shortcut=True)
 print_gradients(model_with_shortcut, sample_input)
 
 # The transformer block component of GPT
-from attention_mechanisms import MultiHeadAttention
+from building_llm.attention_mechanisms import MultiHeadAttention
 
 class TransformerBlock(nn.Module):
 	def __init__(self, cfg):

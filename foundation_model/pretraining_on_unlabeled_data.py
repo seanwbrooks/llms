@@ -1,8 +1,7 @@
 import torch
-import importlib
-from generative_pretrained_transformer_model import GPTModel, generate_text_simple
+from foundation_model.generative_pretrained_transformer_model import GPTModel, generate_text_simple
 import tiktoken
-from byte_pair_encoding import create_dataloader_v1
+from building_llm.byte_pair_encoding import create_dataloader_v1
 
 file_path = "./text_files/infinite-jest.txt"
 with open(file_path, "r", encoding="utf-8") as f:
