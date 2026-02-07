@@ -1,3 +1,6 @@
 __pycache__
 *.pth
 .DS_Store
+saved_models/*
+foundation_model/gpt/124M/*
+
