@@ -5,7 +5,7 @@ import numpy as np
 from gpt_download import download_and_load_gpt2
 
 settings, params = download_and_load_gpt2(
-    model_size="124M", models_dir="gpt"
+    model_size="355M", models_dir="gpt"
 )
 
 model_configs = {
@@ -18,9 +18,9 @@ model_configs = {
 GPT_CONFIG_124M = {
 	"vocab_size": 50257, # Vocabulary size (i.e. The Verdict)
 	"context_length": 1024, # Context size
-	"emb_dim": 768, # Embedding dimension
-	"n_heads": 12, # Number of attention heads
-	"n_layers": 12, # Number of layers
+	"emb_dim": 1024, # Embedding dimension
+	"n_heads": 16, # Number of attention heads
+	"n_layers": 24, # Number of layers
 	"drop_rate": 0.1, # Dropout rate (for preventing overtraining weights)
 	"qkv_bias": False
 }
@@ -149,7 +149,7 @@ class GPTModel(nn.Module):
 		logits = self.out_head(x)
 		return logits
 
-model_name = "gpt2-small (124M)"
+model_name = "gpt2-medium (355M)"
 NEW_CONFIG = GPT_CONFIG_124M.copy()
 NEW_CONFIG.update(model_configs[model_name])
 NEW_CONFIG["context_length"] = 1024
@@ -238,11 +238,11 @@ gpt.to(device)
 torch.manual_seed(123)
 token_ids = generate(
     model=gpt,
-    idx=text_to_token_ids("Don Gately was a character in what novel?", tokenizer).to(device),
-    max_new_tokens=50,
+    idx=text_to_token_ids("There is no traffic like ", tokenizer).to(device),
+    max_new_tokens=10,
     context_size=NEW_CONFIG["context_length"],
-    top_k=50,
-    temperature=1.5
+    top_k=10,
+    temperature=1.0
 )
 
 print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
