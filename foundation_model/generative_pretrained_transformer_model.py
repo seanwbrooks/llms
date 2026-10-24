@@ -3,7 +3,7 @@ import torch.nn as nn
 
 # Configs for small, published, old ass GPT-2 Model
 GPT_CONFIG_124M = {
-	"vocab_size": 50257, # Vocabulary size (i.e. The Verdict)
+	"vocab_size": 50257, # Vocabulary size (GPT-2 BPE tokenizer)
 	"context_length": 1024, # Context size
 	"emb_dim": 768, # Embedding dimension
 	"n_heads": 12, # Number of attention heads

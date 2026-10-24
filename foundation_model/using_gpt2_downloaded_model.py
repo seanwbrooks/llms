@@ -23,12 +23,10 @@ model_configs = {
     "gpt2-xl (1558M)": { "emb_dim": 1600, "n_heads": 25, "n_layers": 48 }
 }
 
-GPT_CONFIG_124M = {
-	"vocab_size": 50257, # Vocabulary size (i.e. The Verdict)
+# Settings shared by every GPT-2 size; emb_dim, n_heads and n_layers come from model_configs
+BASE_CONFIG = {
+	"vocab_size": 50257, # Vocabulary size (GPT-2 BPE tokenizer)
 	"context_length": 1024, # Context size
-	"emb_dim": 1600, # Embedding dimension
-	"n_heads": 25, # Number of attention heads
-	"n_layers": 48, # Number of layers
 	"drop_rate": 0.1, # Dropout rate (for preventing overtraining weights)
 	"qkv_bias": False
 }
@@ -158,7 +156,7 @@ class GPTModel(nn.Module):
 		return logits
 
 model_name = "gpt2-xl (1558M)"
-NEW_CONFIG = GPT_CONFIG_124M.copy()
+NEW_CONFIG = BASE_CONFIG.copy()
 NEW_CONFIG.update(model_configs[model_name])
 NEW_CONFIG["context_length"] = 1024
 NEW_CONFIG["qkv_bias"] = True
@@ -222,7 +220,7 @@ def generate(model, idx, max_new_tokens, context_size, temperature=0.0, top_k=No
 			probs = torch.softmax(logits, dim=-1)
 			idx_next = torch.multinomial(probs, num_samples=1)
 		else:
-			idx_next == torch.argmax(logits, dim=-1, keepdim=True)
+			idx_next = torch.argmax(logits, dim=-1, keepdim=True)
 		if idx_next == eos_id:
 			break
 		idx = torch.cat((idx, idx_next), dim=1)

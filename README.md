@@ -74,13 +74,8 @@ To switch GPT-2 sizes, change `model_size` (the weights folder) and `model_name`
 
 ## Known issues (found while writing this README)
 
-- **Greedy branch of `generate()` is broken.** In both `pretraining_on_unlabeled_data.py` and `using_gpt2_downloaded_model.py`, the line is `idx_next == torch.argmax(...)`, which compares instead of assigning. With `temperature=0.0` (the default), it fails with `NameError`. Every run so far has used temperature > 0, so it hasn't come up.
 - **The training call is commented out** in `pretraining_on_unlabeled_data.py`, so the checkpoints it saves are **untrained** (random weights). This includes the ones in `saved_models/`: the AdamW state in `model_and_optimizer.pth` is empty, which means no optimizer step ever ran. To get an *Infinite Jest* model, uncomment `train_model_simple(...)` and rerun.
-- **Misleading names in `using_gpt2_downloaded_model.py`:**
-  - `GPT_CONFIG_124M` actually holds XL dimensions. It gets overwritten by `model_configs[model_name]` anyway.
-  - The `vocab_size` comment says "The Verdict", but 50,257 is the size of GPT-2's BPE vocabulary.
-- **`tokenizer.py` measures token count, not vocabulary size.** Its commit message says otherwise. Also, `allowed_special={"all"}` should be `allowed_special="all"`.
-- **`CasualAttention`** in `attention_mechanisms.py` should be *Causal*.
+- **`tokenizer.py` measures token count, not vocabulary size**, even though its commit message says otherwise. *Infinite Jest* is 794,776 tokens.
 - **`llm_exercise_a1.ipynb`** is a notebook with one code cell, and that cell contains the raw JSON of a different notebook (Raschka's STAT 453 course). It looks like a mis-paste.
 
 ---
