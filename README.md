@@ -58,7 +58,7 @@ Scripts expect **different working directories**:
 | `building_llm/data_prep.py` | `text_files/` | `cd text_files && python ../building_llm/data_prep.py` |
 | `foundation_model/pretraining_on_unlabeled_data.py` | repo root, as a module | `python -m foundation_model.pretraining_on_unlabeled_data` |
 | `foundation_model/using_gpt2_downloaded_model.py` | `foundation_model/` | `cd foundation_model && python using_gpt2_downloaded_model.py` |
-| `foundation_model/load_saved_model.py` | wherever `model_and_optimizer.pth` is | it loads from the current directory, not `saved_models/` |
+| `foundation_model/load_saved_model.py` | repo root, as a module | `python -m foundation_model.load_saved_model`. Loads `model_and_optimizer.pth` from the repo root, where the pretraining script saves it; copy it out of `saved_models/` first. Importing the pretraining module still runs its demos and loss evaluation, but no longer saves anything. |
 
 To switch GPT-2 sizes, change `model_size` (the weights folder) and `model_name` (the config key) together at the top of `using_gpt2_downloaded_model.py`.
 
