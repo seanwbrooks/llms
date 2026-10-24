@@ -102,7 +102,7 @@ print(batch)
 torch.Size([2, 6, 3])
 
 # A compact casual attention class
-class CasualAttention(nn.Module):
+class CausalAttention(nn.Module):
 	def __init__(self, d_in, d_out, context_length, dropout, qkv_bias=False):
 		super().__init__()
 		self.d_out = d_out
@@ -128,7 +128,7 @@ class CasualAttention(nn.Module):
 
 torch.manual_seed(123)
 context_length = batch.shape[1]
-ca = CasualAttention(d_in, d_out, context_length, 0.0)
+ca = CausalAttention(d_in, d_out, context_length, 0.0)
 context_vecs = ca(batch)
 print("context_vecs.shape: ", context_vecs.shape)
 
@@ -137,7 +137,7 @@ class MultiHeadAttentionWrapper(nn.Module):
 	def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
 		super().__init__()
 		self.heads = nn.ModuleList(
-			[CasualAttention(d_in, d_out, context_length, dropout, qkv_bias) for _ in range(num_heads)]
+			[CausalAttention(d_in, d_out, context_length, dropout, qkv_bias) for _ in range(num_heads)]
 		)
 
 	def forward(self, x):
